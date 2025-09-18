@@ -1,0 +1,182 @@
+<!-- HTML CODE SA WEBSITE / GAME -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Basic 4x4 Sudoku Game</title>
+ 
+</head>
+<body>
+    <h1>4x4 Sudoku Game</h1>
+        <p><strong>Instructions</strong></p>
+<div class="instructions">
+    <p>Each cell must have a number from 1 to 4.</p>
+    <p>Numbers cannot repeat in any row, column, or 2x2 box.</p>
+    <p>Click "Check Solution" to see if you solved it correctly.</p>
+</div>
+        <p><strong>Rules</strong></p>
+    <div class="rules">
+    <ul>Fill the grid so that each row, column, and 2x2 box contains the numbers 1 to 4 without repeating.</ul>
+    </div>
+    <table>
+    <tr>
+        <td><input type="text" id="c1r1" value="1" readonly /></td>
+        <td><input type="text" id="c2r1" /></td>
+        <td><input type="text" id="c3r1" value="4" readonly /></td>
+        <td><input type="text" id="c4r1" /></td>
+    </tr>
+    <tr>
+        <td><input type="text" id="c1r2" /></td>
+        <td><input type="text" id="c2r2" value="3" readonly /></td>
+        <td><input type="text" id="c3r2" /></td>
+        <td><input type="text" id="c4r2" value="2" readonly /></td>
+    </tr>
+    <tr>
+        <td><input type="text" id="c1r3" value="3" readonly /></td>
+        <td><input type="text" id="c2r3" /></td>
+        <td><input type="text" id="c3r3" value="2" readonly /></td>
+        <td><input type="text" id="c4r3" /></td>
+    </tr>
+    <tr>
+        <td><input type="text" id="c1r4" /></td>
+        <td><input type="text" id="c2r4" value="1" readonly /></td>
+        <td><input type="text" id="c3r4" /></td>
+        <td><input type="text" id="c4r4" value="4" readonly /></td>
+    </tr>
+</table>
+  <p>
+     <button id="checkBtn">Check Solution</button>
+    </p>
+     <p>
+    <a a href="index.html">
+     <button>Reset the Table</button>
+    </a>
+    </p>
+
+    <p id="result"></p>
+
+    <div class="game-image">
+        <p>Good luck solving the puzzle!</p>
+        <a href="https://play.google.com/store/apps/details?id=easy.sudoku.puzzle.solver.free&hl=en&pli=1" target="_blank"><img src="4x4sudoku1.jpg" alt="4x4 Sudoku" />
+        </a>
+    </div>
+    
+
+    
+    <!-- CSS NI SIYA PARA DESIGN SA HTML -->
+   <style>
+        .instructions {
+            text-align: left; 
+            max-width: 393px;
+            margin: 0 auto;
+        }
+        .instructions p {
+            margin: 0;
+            line-height: 1.4;
+        }
+        .instructions u {
+            text-align: center;
+        }
+
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            font-size: 20px;
+        }
+        td {
+            border: 1px solid black;
+            padding: 10px;
+        }
+        input {
+            width: 30px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .game-image {
+            margin: 20px 0;
+        }
+        .game-image img {
+            max-width: 400px;
+            height: auto;
+            filter: grayscale(100%);
+            border: 1px solid black;
+        }
+    </style>
+    <script>
+  // Allow only digits 1-4 and only one character per input
+  const inputs = document.querySelectorAll('input[type="text"]:not([readonly])');
+  inputs.forEach(input => {
+    input.addEventListener('input', () => {
+      // Keep only digits 1-4 and limit length to 1
+      input.value = input.value.replace(/[^1-4]/g, '').slice(0,1);
+    });
+  });
+
+  // Function to check for duplicates in an array
+  function hasDuplicates(arr) {
+    let seen = {};
+    for (let num of arr) {
+      if (seen[num]) return true;
+      seen[num] = true;
+    }
+    return false;
+  }
+
+  // Check the Sudoku solution
+  function checkSolution() {
+    const result = document.getElementById('result');
+    let grid = [];
+
+    // Read values into grid array
+    for (let r = 1; r <= 4; r++) {
+      let row = [];
+      for (let c = 1; c <= 4; c++) {
+        let val = document.getElementById(`c${c}r${r}`).value.trim();
+        if (val === '') {
+          result.textContent = 'Please fill all cells with numbers 1 to 4.';
+          result.style.color = 'red';
+          return;
+        }
+        row.push(val);
+      }
+      grid.push(row);
+    }
+
+    // Check rows and columns for duplicates
+    for (let i = 0; i < 4; i++) {
+      let row = grid[i];
+      let col = [grid[0][i], grid[1][i], grid[2][i], grid[3][i]];
+      if (hasDuplicates(row) || hasDuplicates(col)) {
+        result.textContent = 'Duplicates found in a row or column.';
+        result.style.color = 'red';
+        return;
+      }
+    }
+
+    // Check 2x2 boxes for duplicates
+    let boxes = [
+      [grid[0][0], grid[0][1], grid[1][0], grid[1][1]],
+      [grid[0][2], grid[0][3], grid[1][2], grid[1][3]],
+      [grid[2][0], grid[2][1], grid[3][0], grid[3][1]],
+      [grid[2][2], grid[2][3], grid[3][2], grid[3][3]]
+    ];
+    for (let box of boxes) {
+      if (hasDuplicates(box)) {
+        result.textContent = 'Duplicates found in a 2x2 box.';
+        result.style.color = 'red';
+        return;
+      }
+    }
+
+    // If all checks pass
+    result.textContent = 'Congratulations! You solved the puzzle!';
+    result.style.color = 'green';
+  }
+
+  // Attach checkSolution to button click
+  document.getElementById('checkBtn').addEventListener('click', checkSolution);
+</script>
